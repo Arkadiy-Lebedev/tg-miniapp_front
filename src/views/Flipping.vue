@@ -1,10 +1,11 @@
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
-import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { ref, onMounted, computed, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {useUserStore} from '@/stores/user' 
 import { io } from 'socket.io-client';
+import { gsap } from 'gsap'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -35,10 +36,52 @@ const gameOver = ref(false);
 const winner = ref(-1);
 const isCreate = ref(false)
 const myIdRoom = ref('')
+const gameScreen = ref<HTMLElement | null>(null)
+const textStep = ref('')
 
 const isYourTurn = computed(() => {
   if (!gameStarted.value || !players.value.length) return false;
   return players.value[currentPlayer.value]?.id === socket.id;
+});
+
+
+let animationTimeout: ReturnType<typeof setTimeout>;
+
+watch(currentPlayer, (newVal, oldVal) => {
+  if (!gameStarted.value || !players.value.length) return;
+
+  // Очищаем предыдущий таймаут
+  clearTimeout(animationTimeout);
+  
+  // Останавливаем текущие анимации элемента
+  gsap.killTweensOf(gameScreen.value);
+
+  if (players.value[currentPlayer.value]?.id === socket.id) {
+    console.log("ваш ход");
+    textStep.value = "Ваш ход";
+  } else {
+    textStep.value = "ход противника";
+    console.log("ход противника");
+  }
+
+  // Запускаем новую анимацию
+  gsap.fromTo(gameScreen.value, 
+    { autoAlpha: 0 },
+    { 
+      autoAlpha: 1, 
+      duration: 1, 
+      ease: 'power2.inOut',
+      onComplete: () => {
+        animationTimeout = setTimeout(() => {
+          gsap.to(gameScreen.value, { 
+            autoAlpha: 0, 
+            duration: 1, 
+            ease: 'power2.inOut' 
+          });
+        }, 1000);
+      }
+    }
+  );
 });
 
 
@@ -119,6 +162,7 @@ socket.on('playerJoined', (data: {players:Player[], roomId:string}) => {
   console.log( data.players)
   players.value = data.players;
   roomId.value = data.roomId
+  isCreate.value = false
 });
 
 socket.on('gameStarted', (data: { cards: Card[], currentPlayer: number }) => {
@@ -191,7 +235,7 @@ onUnmounted(() => {
     <div class="content">
 
 <div  class="main">
-  <p class="mainTitle">Найди пару</p>
+  <!-- <p class="mainTitle">Найди пару</p> -->
   <div v-if="isCreate" > 
     <div class="loading">
           <p class="text-find title">
@@ -214,7 +258,7 @@ viewBox="0 0 128 128" xml:space="preserve">
 
 
   <div v-else>
-      <div class="menu">
+      <div v-if="!gameStarted" class="menu">
         <button @click="createRoom">Найти соперника</button>
         <!-- <div class="or-divider">или</div>
         <input v-model="joinRoomId" placeholder="Код комнаты" />
@@ -263,14 +307,17 @@ viewBox="0 0 128 128" xml:space="preserve">
 </div>
     <div  v-else>
       <div class="game-header">
-        <h2>Комната: {{ roomId }}</h2>
         <div class="players-info">
           <div v-for="(player, index) in players" :key="index" 
-               :class="{ 'active-player': currentPlayer === index }">
-            {{ player.username }}: {{ player.score }} очков
+              >
+               <p class="name"  :class="{ 'active-player': currentPlayer === index }">
+                 {{ player.username }}:  {{ player.score }}
+               </p>
+            
+        
           </div>
         </div>
-        <div v-if="isYourTurn" class="your-turn">Ваш ход!</div>
+        <!-- <div v-if="isYourTurn" class="your-turn">Ваш ход!</div> -->
       </div>
 
       <div class="game-board" :style="`grid-template-columns: repeat(4, 1fr)`">
@@ -283,6 +330,10 @@ viewBox="0 0 128 128" xml:space="preserve">
              @click="onCardClick(card.id)">
           <div class="card-front"></div>
           <div class="card-back">{{ card.value }}</div>
+        </div>
+
+        <div v-if="textStep!=''" ref="gameScreen" class="screen-step">
+{{ textStep }}
         </div>
       </div>
 
@@ -301,6 +352,35 @@ viewBox="0 0 128 128" xml:space="preserve">
   
    
     <style scoped>
+
+    .screen-step{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .name{
+      font-size: calc(var(--app-width)* 4 / 100);
+      color: #a0a0a0;
+      transition: color 0.3s ease;
+    }
+    
+  .counter{
+      font-size: calc(var(--app-width)* 4 / 100);
+      color: #a0a0a0;
+    }
+
+    .players-info{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
     
     .cancel{    
       display: block;
@@ -405,7 +485,7 @@ box-shadow:  13px 13px 26px #03301f,
 
 .active-player {
   font-weight: bold;
-  color: #42b983;
+  color: #ffffff;
 }
 
 .game-board {
