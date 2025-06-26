@@ -1,0 +1,37 @@
+@font-face {
+    font-family: 'StyreneALC';
+    src:
+        
+        local('StyreneALC-Regular'),
+        url('@/assets/fonts/StyreneALC-Regular.woff2') format('woff2'),
+        url('@/assets/fonts/StyreneALC-Regular.woff') format('woff'),
+        url('@/assets/fonts/StyreneALC-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'StyreneALC';
+    src:
+        local('StyreneALC-Bold'),
+        url('@/assets/fonts/StyreneALC-Bold.woff2') format('woff2'),
+        url('@/assets/fonts/StyreneALC-Bold.woff') format('woff'),
+        url('@/assets/fonts/StyreneALC-Bold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'StyreneALC';
+    src:
+        local('StyreneALC-Black'),
+        url('@/assets/fonts/StyreneALC-Black.woff2') format('woff2'),
+        url('@/assets/fonts/StyreneALC-Black.woff') format('woff'),
+        url('@/assets/fonts/StyreneALC-Black.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
