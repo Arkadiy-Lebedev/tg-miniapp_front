@@ -3,6 +3,7 @@ import Index from '../views/Index.vue'
 import Game from '../views/Game.vue'
 import Liders from '../views/Liders.vue'
 import Flipping from '../views/Flipping.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -26,6 +27,7 @@ const router = createRouter({
       name: 'flipping',
       component: Flipping
     },
+
   ]
 })
 

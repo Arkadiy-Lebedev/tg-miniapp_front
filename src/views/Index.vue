@@ -128,9 +128,15 @@ const notify = () => {
   </p>
 </div>
 <div ref="btnRef" class="btn__group">
-  <div  class="btn-wrapper">
+  <div class="btn-group">
+     <div  class="btn-wrapper">
   <ButtonAlfa @click="goGame" :disabled="userStore.user.ticket <= 0" text="Играть"/>
 </div>
+<div  class="btn-wrapper">
+  <ButtonAlfa @click=" router.push({ name: 'flipping' })"  text="дуэль"/>
+</div>
+  </div>
+ 
 <div  class="btn-wrapper">
   <ButtonAlfa @click="router.push({ name: 'liders' })" text="Лидеры"/>
 </div>
@@ -156,6 +162,11 @@ const notify = () => {
 .btn-block__promo{
   display: flex;
   gap:  calc(var(--app-width)* 4 / 100);;
+}
+
+.btn-group{
+    display: flex;
+  gap:  calc(var(--app-width)* 4 / 100);
 }
 
 .ticket_block{

@@ -8,6 +8,13 @@ import {MOCK_DATA, MOCK_INITDATA} from '@/mockData/mockData'
 import {useUserStore} from '@/stores/user' 
 import {baseUrl} from '@/API/api' 
 
+// чтобы сбрасывать кеш
+const launchParams = new URLSearchParams(window.location.search);
+const currentVersion = new Date().getTime(); // или хэш коммита
+if (!launchParams.has('v')) {
+  window.location.href = `${window.location.origin}?v=${currentVersion}`;
+}
+
 const userStore = useUserStore()
 
 
